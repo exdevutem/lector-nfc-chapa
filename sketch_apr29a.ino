@@ -7,6 +7,7 @@
 
 #define SS_PIN 2  // SDA pin connected to D4
 #define RST_PIN 0 // RST pin connected to D3
+#define BUZZER_PIN 5 // Pin connected to the buzzer (D1)
 
 MFRC522 mfrc522(SS_PIN, RST_PIN); // Create MFRC522 instance
 
@@ -15,7 +16,8 @@ const char *password = "";
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("");
+  Serial.println(".");
+  Serial.println(".");
   Serial.print("Conectandose al Wi-Fi ");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -31,6 +33,8 @@ void setup() {
   mfrc522.PCD_Init(); // Init MFRC522
 
   Serial.println("RFID-RC522 inicializado.");
+
+  pinMode(BUZZER_PIN, OUTPUT); // Set the buzzer pin as output
 }
 
 void loop() {
@@ -45,7 +49,14 @@ void loop() {
     if (tagUID != "") {
       if (sendTagUID(tagUID)) {
         Serial.println("Tag UID enviado correctamente.");
+        // Sound the buzzer
+        tone(BUZZER_PIN, 2000); // 2000 Hz frequency
+        delay(1000); // Sound duration
+        noTone(BUZZER_PIN); // Turn off the buzzer
       } else {
+        tone(BUZZER_PIN, 1000); // 1000 Hz frequency
+        delay(500); // Sound duration
+        noTone(BUZZER_PIN); // Turn off the buzzer
         Serial.println("Error al enviar el Tag UID.");
       }
     } else {
